@@ -1,5 +1,5 @@
 class TicTacToe
-  attr_accessor :board, :player1, :player2
+  attr_reader :player1, :player2
 
   @@board = [[1, 2, 3],
              [4, 5, 6],
@@ -20,15 +20,6 @@ class TicTacToe
     @player2 = player2
   end
 
-  def add_player(player)
-    @players << player
-    player.board = @board
-  end
-
-  def add_board
-    @@board = @board
-  end
-
   def display_board
     puts <<-HEREDOC
          #{@@board[0][0]} | #{@@board[0][1]} | #{@@board[0][2]}
@@ -43,14 +34,14 @@ class TicTacToe
     current_player = player1
 
     loop do
+      puts "\n#{current_player.name}, choose a number between 1-9 that is available on the board\n"
       begin
-        puts "#{current_player.name}, choose a number between 1-9 that is available on the board"
         display_board
         num = gets.chomp
         key = @@board_keys[num.to_i]
-        raise "Position taken" if @@board[key[0]][key[1]].class == String
+        raise 'Position taken' if @@board[key[0]][key[1]].instance_of?(String)
       rescue  Exception => e
-        puts "#{e}, choose any other position that's currently unoccupied"
+        puts "\n#{e}, choose any other position that's currently unoccupied on the board\n"
         retry
       else
         @@board[key[0]][key[1]] = current_player.icon
@@ -60,6 +51,7 @@ class TicTacToe
         puts "#{current_player.name} wins the game!"
         break
       elsif board_full?
+        display_board
         puts "It's a draw!"
         break
       else
@@ -76,11 +68,8 @@ class TicTacToe
     end
   end
 
-  def show_board
-    @@board
-  end
-
   def game_over?
+    # Build winning combos then check if any of such combo already existed
     combos = []
     combos << @@board[0]
     combos << @@board[1]
