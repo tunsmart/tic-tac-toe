@@ -1,103 +1,29 @@
-class TicTacToe
-  attr_reader :player1, :player2
+require_relative 'players'
+require_relative 'tictactoe'
 
-  @@board = [[1, 2, 3],
-             [4, 5, 6],
-             [7, 8, 9]]
-  @@board_keys = { 1 => [0, 0],
-                   2 => [0, 1],
-                   3 => [0, 2],
-                   4 => [1, 0],
-                   5 => [1, 1],
-                   6 => [1, 2],
-                   7 => [2, 0],
-                   8 => [2, 1],
-                   9 => [2, 2] }
+puts "Welcome to TicTacToe Player 1\n"
+puts "What's your name"
+player1_name = gets.chomp
+puts "\nWelcome #{player1_name}, What would you like your icon on the board to be. Choose any letter from a-z\n"
+player1_icon = gets.chomp
 
-  def initialize(player1, player2)
-    @current_player = nil
-    @player1 = player1
-    @player2 = player2
-  end
-
-  def display_board
-    puts <<-HEREDOC
-         #{@@board[0][0]} | #{@@board[0][1]} | #{@@board[0][2]}
-        ---+---+---
-         #{@@board[1][0]} | #{@@board[1][1]} | #{@@board[1][2]}
-        ---+---+---
-         #{@@board[2][0]} | #{@@board[2][1]} | #{@@board[2][2]}
-    HEREDOC
-  end
-
-  def play
-    current_player = player1
-
-    loop do
-      puts "\n#{current_player.name}, choose a number between 1-9 that is available on the board\n"
-      begin
-        display_board
-        num = gets.chomp
-        key = @@board_keys[num.to_i]
-        raise 'Position taken' if @@board[key[0]][key[1]].instance_of?(String)
-      rescue  Exception => e
-        puts "\n#{e}, choose any other position that's currently unoccupied on the board\n"
-        retry
-      else
-        @@board[key[0]][key[1]] = current_player.icon
-      end
-      if game_over?
-        display_board
-        puts "#{current_player.name} wins the game!"
-        break
-      elsif board_full?
-        display_board
-        puts "It's a draw!"
-        break
-      else
-        current_player = switch_player(current_player)
-      end
-    end
-  end
-
-  def switch_player(current_player)
-    if current_player == player1
-      player2
-    else
-      player1
-    end
-  end
-
-  def game_over?
-    # Build winning combos then check if any of such combo already existed
-    combos = []
-    combos << @@board[0]
-    combos << @@board[1]
-    combos << @@board[2]
-    combos << [@@board[0][0], @@board[1][0], @@board[2][0]]
-    combos << [@@board[0][1], @@board[1][1], @@board[2][1]]
-    combos << [@@board[0][2], @@board[1][2], @@board[2][2]]
-    combos << [@@board[0][0], @@board[1][1], @@board[2][2]]
-    combos << [@@board[0][2], @@board[1][1], @@board[2][0]]
-    combos.any? { |combo| combo.uniq.length == 1 }
-  end
-
-  def board_full?
-    @@board.flatten.all? { |item| item.instance_of?(String) }
-  end
+puts "Welcome to TicTacToe Player 2\n"
+puts "What's your name"
+player2_name = gets.chomp
+puts "\nWelcome #{player2_name}, What would you like your icon on the board to be.
+    Choose any letter from a-z that is not #{player1_icon} \n"
+begin
+  icon = gets.chomp
+  raise "icon already chosen by #{player1_name}, your opponent" if icon.downcase == player1_icon.downcase
+rescue  Exception => e
+  puts "#{e}, choose another letter"
+  retry
+else
+  player2_icon = icon
 end
 
-class Players
-  attr_reader :name, :icon
-
-  def initialize(name, icon)
-    @name = name
-    @icon = icon
-  end
-end
-
-player1 = Players.new('Sam', 'x')
-player2 = Players.new('Kate', 'o')
+player1 = Players.new(player1_name, player1_icon)
+player2 = Players.new(player2_name, player2_icon)
 
 game = TicTacToe.new(player1, player2)
 game.play
